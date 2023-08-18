@@ -6,9 +6,18 @@ import { AppService } from './app.service';
 import { UserModule } from './module/user/user.module';
 import { AuthModule } from './module/auth/auth.module';
 import { User } from './module/user/entities/user.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './common/constant/jwt.constant';
 
 @Module({
   imports: [
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: {
+        expiresIn: `${60 * 60}s`,
+      },
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

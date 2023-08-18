@@ -7,10 +7,15 @@ import {
   userPasswordError,
 } from 'src/common/constant/error.constant';
 import { ErrorExceptionFilter } from 'src/filter/ErrorExceptionFilter';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from 'src/common/constant/jwt.constant';
 
 @Injectable()
 export class AuthService {
-  constructor(private UserService: UserService) {}
+  constructor(
+    private UserService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
   async create(createAuthDto: CreateAuthDto) {
     const { username, password } = createAuthDto;
     const user = await this.UserService.findOne(username);
@@ -27,10 +32,15 @@ export class AuthService {
     const { username, password } = signInAuthDto;
     const user = await this.UserService.findOne(username);
     const { password: ps, ...rest } = user || {};
-    if (password === ps) {
-      return rest;
+    if (password !== ps) {
+      throw new ErrorExceptionFilter(userPasswordError);
     }
-    throw new ErrorExceptionFilter(userPasswordError);
+    const payload = { sub: user.id, username: user.username };
+    const access_token = await this.jwtService.signAsync(payload);
+    return {
+      token_type: jwtConstants.token_type,
+      access_token,
+    };
   }
 
   findAll() {
