@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApiResult } from 'src/common/swagger/ApiResult';
 import { User } from './entities/user.entity';
+import { QueryUserDto } from './dto/read-user.dto';
 
 @ApiTags('用户模块')
 @ApiBearerAuth()
@@ -22,8 +23,8 @@ export class UserController {
 
   @ApiOperation({ summary: '获取用户列表' })
   @ApiResult(User, true)
-  @Get('list')
-  findAll() {
-    return this.userService.findAll();
+  @Post('list')
+  findAll(@Body() queryUser: QueryUserDto) {
+    return this.userService.findAll(queryUser);
   }
 }

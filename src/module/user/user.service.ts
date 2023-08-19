@@ -5,6 +5,7 @@ import { genSaltSync, hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { QueryUserDto } from './dto/read-user.dto';
 
 @Injectable()
 export class UserService {
@@ -22,8 +23,20 @@ export class UserService {
     });
   }
 
-  findAll() {
-    return this.UserRepository.find();
+  async findAll(queryUser: QueryUserDto) {
+    const { pageSize, pageNo } = queryUser;
+    const limit = pageSize * (pageNo - 1);
+    const list = await this.UserRepository.find({
+      take: pageSize,
+      skip: limit,
+    });
+    const total = await this.UserRepository.count();
+    return {
+      list,
+      total,
+      pageSize,
+      pageNo,
+    };
   }
 
   findOne(username: string) {

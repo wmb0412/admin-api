@@ -13,7 +13,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalGuards(new AuthGuard());
-  app.useGlobalPipes(new validatePipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   const options = new DocumentBuilder()
     .addBearerAuth()
     .setTitle('good_music')

@@ -8,6 +8,8 @@ import { AuthModule } from './module/auth/auth.module';
 import { User } from './module/user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './common/constant/jwt.constant';
+import { validatePipe } from './pipe/validate.pipe';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -33,6 +35,12 @@ import { jwtConstants } from './common/constant/jwt.constant';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: validatePipe,
+    },
+  ],
 })
 export class AppModule {}
