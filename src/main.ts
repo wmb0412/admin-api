@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './filter/HttpExceptionFilter.filter';
 import { AuthGuard } from './guard/auth.guard';
+import { ValidationPipe } from '@nestjs/common';
+import { validatePipe } from './pipe/validate.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +13,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalGuards(new AuthGuard());
+  app.useGlobalPipes(new validatePipe());
   const options = new DocumentBuilder()
     .addBearerAuth()
     .setTitle('good_music')

@@ -1,3 +1,7 @@
+export const getInvalidParams = (message = '无效的参数') => ({
+  code: 10001,
+  message,
+});
 export const userAlreadyExited = {
   code: 10002,
   message: '用户已存在',
