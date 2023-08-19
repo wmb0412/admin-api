@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { compareSync } from 'bcrypt';
 import { CreateAuthDto, SignInAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from '../user/user.service';
@@ -32,7 +33,7 @@ export class AuthService {
     const { username, password } = signInAuthDto;
     const user = await this.UserService.findOne(username);
     const { password: ps, ...rest } = user || {};
-    if (password !== ps) {
+    if (!compareSync(password, ps)) {
       throw new ErrorExceptionFilter(userPasswordError);
     }
     const payload = { sub: user.id, username: user.username };
