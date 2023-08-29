@@ -10,9 +10,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './common/constant/jwt.constant';
 import { validatePipe } from './pipe/validate.pipe';
 import { APP_PIPE } from '@nestjs/core';
+import { MusicModule } from './module/music/music.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { filenamePipe } from './pipe/fileName.pipe';
+export const UPLOADS_DIR = join(__dirname, '../uploads');
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: UPLOADS_DIR,
+    }),
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
@@ -27,12 +36,12 @@ import { APP_PIPE } from '@nestjs/core';
       username: 'root',
       password: '12345678',
       database: 'good_music',
-      // entities: [User],
       autoLoadEntities: true,
       synchronize: true,
     }),
     UserModule,
     AuthModule,
+    MusicModule,
   ],
   controllers: [AppController],
   providers: [
@@ -40,7 +49,7 @@ import { APP_PIPE } from '@nestjs/core';
     {
       provide: APP_PIPE,
       useClass: validatePipe,
-    },
+    }
   ],
 })
 export class AppModule {}

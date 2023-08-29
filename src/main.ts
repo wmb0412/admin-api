@@ -5,7 +5,6 @@ import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './filter/HttpExceptionFilter.filter';
 import { AuthGuard } from './guard/auth.guard';
 import { ValidationPipe } from '@nestjs/common';
-import { validatePipe } from './pipe/validate.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
