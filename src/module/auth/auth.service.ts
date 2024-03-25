@@ -41,7 +41,11 @@ export class AuthService {
     return {
       token_type: jwtConstants.token_type,
       access_token,
+      ...rest,
     };
+  }
+  logout() {
+    return '';
   }
 
   findAll() {

@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
   reflector = new Reflector();
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as Request;
-    const isPublics = this.reflector.getAllAndMerge(PUBLIC_KEY, [
+    const isPublics = this.reflector.getAll(PUBLIC_KEY, [
       context.getClass(),
       context.getHandler(),
     ]);

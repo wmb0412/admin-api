@@ -1,3 +1,7 @@
+export const CommonError = {
+  code: 10000,
+  message: '服务器错误',
+};
 export const getInvalidParams = (message = '无效的参数') => ({
   code: 10001,
   message,
