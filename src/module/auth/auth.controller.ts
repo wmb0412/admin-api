@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Res, Headers } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiExtraModels } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import {
@@ -11,6 +11,7 @@ import { User } from '../user/entities/user.entity';
 import { ResponseDto } from 'src/common/dto/ResponseDto';
 import { ApiResult } from 'src/common/swagger/ApiResult';
 import { Public } from 'src/decorator/public.decorator';
+import { Response } from 'express';
 
 @ApiTags('身份认证')
 @Controller('auth')
@@ -30,7 +31,12 @@ export class AuthController {
   @ApiResult(userLoginResponse)
   @Post('signIn')
   @Public()
-  signIn(@Body() signInAuthDto: SignInAuthDto) {
-    return this.authService.signIn(signInAuthDto);
+  @Public()
+  @Post('login')
+  signIn(
+    @Body() signInAuthDto: SignInAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.signIn(signInAuthDto, res);
   }
 }

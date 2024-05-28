@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { compareSync } from 'bcrypt';
+import { Response } from 'express';
 import { CreateAuthDto, SignInAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from '../user/user.service';
@@ -29,7 +30,7 @@ export class AuthService {
     });
     return createUser;
   }
-  async signIn(signInAuthDto: SignInAuthDto) {
+  async signIn(signInAuthDto: SignInAuthDto, res?: Response) {
     const { username, password } = signInAuthDto;
     const user = await this.UserService.findOne(username);
     const { password: ps, ...rest } = user || {};
@@ -38,11 +39,16 @@ export class AuthService {
     }
     const payload = { sub: user.id, username: user.username };
     const access_token = await this.jwtService.signAsync(payload);
-    return {
-      token_type: jwtConstants.token_type,
-      access_token,
-      ...rest,
-    };
+    res.cookie(
+      jwtConstants.cookie_key,
+      `${jwtConstants.token_type} ${access_token}`,
+      {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      },
+    );
+    return rest;
   }
   logout() {
     return '';

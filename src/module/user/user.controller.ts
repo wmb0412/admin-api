@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApiResult } from 'src/common/swagger/ApiResult';
 import { User } from './entities/user.entity';
@@ -17,9 +7,9 @@ import { QueryUserDto } from './dto/read-user.dto';
 import { AuthService } from '../auth/auth.service';
 import { SignInAuthDto } from '../auth/dto/create-auth.dto';
 import { Public } from 'src/decorator/public.decorator';
+import { Response } from 'express';
 
 @ApiTags('用户模块')
-@Public()
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
@@ -37,8 +27,11 @@ export class UserController {
 
   @Public()
   @Post('login')
-  login(@Body() signInAuthDto: SignInAuthDto) {
-    return this.authService.signIn(signInAuthDto);
+  login(
+    @Body() signInAuthDto: SignInAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.signIn(signInAuthDto, res);
   }
 
   @Post('logout')
