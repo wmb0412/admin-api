@@ -1,13 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { compareSync } from 'bcrypt';
 import { Response } from 'express';
 import { CreateAuthDto, SignInAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from '../user/user.service';
-import {
-  userAlreadyExited,
-  userPasswordError,
-} from 'src/common/constant/error.constant';
+import { userPasswordError } from 'src/common/constant/error.constant';
 import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constant/jwt.constant';
@@ -20,10 +17,7 @@ export class AuthService {
   ) {}
   async create(createAuthDto: CreateAuthDto) {
     const { username, password } = createAuthDto;
-    const user = await this.UserService.findOne(username);
-    if (user) {
-      throw new ErrorExceptionFilter(userAlreadyExited);
-    }
+
     const createUser = await this.UserService.create({
       username,
       password,
@@ -45,6 +39,7 @@ export class AuthService {
       {
         httpOnly: true,
         sameSite: 'none',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         secure: true,
       },
     );

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -19,14 +24,15 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublics.includes(true)) return true;
     const token = this.getTokenByRequest(request);
-    if (!token) throw new ErrorExceptionFilter(Unauthorized);
+    if (!token)
+      throw new ErrorExceptionFilter(Unauthorized, HttpStatus.FORBIDDEN);
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
       request['user'] = payload;
     } catch (error) {
-      throw new ErrorExceptionFilter(Unauthorized);
+      throw new ErrorExceptionFilter(Unauthorized, HttpStatus.FORBIDDEN);
     }
     return true;
   }
