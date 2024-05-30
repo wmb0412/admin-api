@@ -7,9 +7,9 @@ import {
   userInfoDto,
 } from './dto/login-weixin.dto';
 import axios from 'axios';
-import { WEIXIN_CONFIG } from 'src/config/weixin.config';
 import { JwtService } from '@nestjs/jwt';
-import { getWeixinUserInfo } from 'src/utils/weixin';
+import { getWeixinUserInfo } from 'src/common/utils/weixin';
+import { WEIXIN_CONFIG } from 'src/config/weixin.config';
 @Injectable()
 export class WeixinService {
   constructor(private readonly jwtService: JwtService) {}

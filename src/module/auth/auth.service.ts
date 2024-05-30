@@ -8,7 +8,7 @@ import {
   userAlreadyExited,
   userPasswordError,
 } from 'src/common/constant/error.constant';
-import { ErrorExceptionFilter } from 'src/filter/ErrorExceptionFilter';
+import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constant/jwt.constant';
 

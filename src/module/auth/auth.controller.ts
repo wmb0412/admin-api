@@ -10,7 +10,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { User } from '../user/entities/user.entity';
 import { ResponseDto } from 'src/common/dto/ResponseDto';
 import { ApiResult } from 'src/common/swagger/ApiResult';
-import { Public } from 'src/decorator/public.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
 import { Response } from 'express';
 
 @ApiTags('身份认证')

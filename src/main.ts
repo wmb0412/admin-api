@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { TransformInterceptor } from './interceptor/transform.interceptor';
-import { HttpExceptionFilter } from './filter/HttpExceptionFilter.filter';
-import { AuthGuard } from './guard/auth.guard';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
+import { HttpExceptionFilter } from './common/filter/HttpExceptionFilter.filter';
+import { AuthGuard } from './common/guard/auth.guard';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 

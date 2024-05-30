@@ -17,7 +17,7 @@ import {
   TokenWeixinDto,
   userInfoDto,
 } from './dto/login-weixin.dto';
-import { Public } from 'src/decorator/public.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('weixin')
 export class WeixinController {

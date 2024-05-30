@@ -13,7 +13,7 @@ import {
 import { MusicService } from './music.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { queryMusicDto } from './music.dto';
-import { filenamePipe } from 'src/pipe/fileName.pipe';
+import { filenamePipe } from 'src/common/pipe/fileName.pipe';
 
 @Controller('music')
 export class MusicController {
