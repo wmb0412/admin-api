@@ -72,17 +72,17 @@ export class UserService {
       include: {
         roles: true,
       },
-      // omit: {
-      //   password: true,
-      // },
-      select: {
-        id: true,
-        username: true,
-        createdAt: true,
-        updatedAt: true,
-        password: false,
-        roles: true,
+      omit: {
+        password: true,
       },
+      // select: {
+      //   id: true,
+      //   username: true,
+      //   createdAt: true,
+      //   updatedAt: true,
+      //   password: false,
+      //   roles: true,
+      // },
     } as any);
     const total = await this.prisma.user.count();
     return {
