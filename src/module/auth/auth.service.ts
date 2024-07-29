@@ -8,17 +8,19 @@ import { userPasswordError } from 'src/common/constant/error.constant';
 import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constant/jwt.constant';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private UserService: UserService,
+    private userService: UserService,
     private readonly jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
   async create(createAuthDto: CreateAuthDto) {
     const { username, password } = createAuthDto;
 
-    const createUser = await this.UserService.create({
+    const createUser = await this.userService.create({
       username,
       password,
     });
@@ -26,12 +28,15 @@ export class AuthService {
   }
   async signIn(signInAuthDto: SignInAuthDto, res?: Response) {
     const { username, password } = signInAuthDto;
-    const user = await this.UserService.findOne(username);
+    const user = await this.userService.findOne(username);
+    if (!user) {
+      throw new ErrorExceptionFilter(userPasswordError);
+    }
     const { password: ps, ...rest } = user || {};
     if (!compareSync(password, ps)) {
       throw new ErrorExceptionFilter(userPasswordError);
     }
-    const payload = { sub: user.id, username: user.username };
+    const payload = { id: user.id, username: user.username };
     const access_token = await this.jwtService.signAsync(payload);
     res.cookie(
       jwtConstants.cookie_key,
@@ -44,6 +49,10 @@ export class AuthService {
       },
     );
     return rest;
+  }
+  signOut(res?: Response) {
+    res.cookie(jwtConstants.cookie_key, '', {});
+    return '';
   }
   logout() {
     return '';

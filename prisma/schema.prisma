@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  password  String
+  username  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roles     Role[]
+}
+model Role{
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  users    User[]
+  permissions Permission[]
+}
+
+model Permission{
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  key       String  @unique
+  description String?
+  roles    Role[]
+}
+
+model Sheet {
+  id      Int  @id @default(autoincrement())
+  context Json
+}

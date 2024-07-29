@@ -8,16 +8,15 @@ import {
   Delete,
   Param,
   Put,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { ApiResult } from 'src/common/swagger/ApiResult';
-import { User } from './entities/user.entity';
 import { QueryUserDto } from './dto/read-user.dto';
 import { AuthService } from '../auth/auth.service';
 import { SignInAuthDto } from '../auth/dto/create-auth.dto';
 import { Public } from 'src/common/decorator/public.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -31,9 +30,8 @@ export class UserController {
   ) {}
 
   @ApiOperation({ summary: '获取用户列表' })
-  @ApiResult(User, true)
-  @Get('list')
-  findAll(@Query() queryUser: QueryUserDto) {
+  @Post('list')
+  findAll(@Body() queryUser: QueryUserDto) {
     return this.userService.findAll(queryUser);
   }
   @ApiOperation({ summary: '新增用户' })
@@ -63,5 +61,9 @@ export class UserController {
   @Post('logout')
   logout() {
     return this.authService.logout();
+  }
+  @Get('info')
+  info(@Req() res: Request) {
+    return this.userService.info(res);
   }
 }

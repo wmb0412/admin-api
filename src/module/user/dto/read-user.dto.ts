@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { OrderEnum } from 'src/common/constant/query.constant';
 
 export class QueryUserDto {
   @ApiProperty({
@@ -12,4 +13,8 @@ export class QueryUserDto {
   })
   @IsNotEmpty()
   pageNo = 1;
+
+  sortBy?: string;
+  orderBy?: OrderEnum;
+  filters?: Record<string, any>;
 }

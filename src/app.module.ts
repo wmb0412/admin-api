@@ -1,22 +1,26 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { UserModule } from './module/user/user.module';
 import { AuthModule } from './module/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './common/constant/jwt.constant';
 import { validatePipe } from './common/pipe/validate.pipe';
 import { APP_PIPE } from '@nestjs/core';
-import { MusicModule } from './module/music/music.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { DemoModule } from './module/demo/demo.module';
 import { WeixinModule } from './module/weixin/weixin.module';
-import { DB_CONFIG } from 'src/config/db.config';
+import { ConfigModule } from '@nestjs/config';
+import { SheetModule } from './module/sheet/sheet.module';
+import { RoleModule } from './module/role/role.module';
+import { PermissionModule } from './module/permission/permission.module';
+import configuration from 'config/configuration';
 export const UPLOADS_DIR = join(__dirname, '../uploads');
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
     ServeStaticModule.forRoot({
       rootPath: UPLOADS_DIR,
     }),
@@ -27,12 +31,12 @@ export const UPLOADS_DIR = join(__dirname, '../uploads');
         expiresIn: `${60 * 60}s`,
       },
     }),
-    TypeOrmModule.forRoot(DB_CONFIG),
     UserModule,
     AuthModule,
-    MusicModule,
-    DemoModule,
     WeixinModule,
+    SheetModule,
+    RoleModule,
+    PermissionModule,
   ],
   controllers: [],
   providers: [
