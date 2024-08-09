@@ -7,7 +7,7 @@ import { validatePipe } from './common/pipe/validate.pipe';
 import { APP_PIPE } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { WeixinModule } from './module/weixin/weixin.module';
+// import { WeixinModule } from './module/weixin/weixin.module';
 import { ConfigModule } from '@nestjs/config';
 import { SheetModule } from './module/sheet/sheet.module';
 import { RoleModule } from './module/role/role.module';
@@ -33,7 +33,7 @@ export const UPLOADS_DIR = join(__dirname, '../uploads');
     }),
     UserModule,
     AuthModule,
-    WeixinModule,
+    // WeixinModule,
     SheetModule,
     RoleModule,
     PermissionModule,
