@@ -17,4 +17,5 @@ export class QueryUserDto {
   sortBy?: string;
   orderBy?: OrderEnum;
   filters?: Record<string, any>;
+  searchName?: string;
 }

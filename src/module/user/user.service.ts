@@ -40,15 +40,23 @@ export class UserService {
       orderBy = 'desc',
       sortBy = 'updatedAt',
       filters,
+      searchName,
     } = queryUser;
     const limit = pageSize * (pageNo - 1);
+    const searchWhere = {
+      username: {
+        contains: searchName,
+      },
+    };
     const where: any = filters
       ? Object.keys(filters).reduce((_map, key) => {
           if (filters[key]) {
             if (key === 'roles') {
               _map[key] = {
-                id: {
-                  in: filters[key],
+                some: {
+                  id: {
+                    in: filters[key],
+                  },
                 },
               };
             } else {
@@ -58,9 +66,8 @@ export class UserService {
             }
           }
           return _map;
-        }, {})
-      : undefined;
-    console.log('where', where);
+        }, searchWhere)
+      : searchWhere;
     const list = await this.prisma.user.findMany({
       orderBy: {
         // updatedAt: 'desc',
@@ -75,16 +82,10 @@ export class UserService {
       omit: {
         password: true,
       },
-      // select: {
-      //   id: true,
-      //   username: true,
-      //   createdAt: true,
-      //   updatedAt: true,
-      //   password: false,
-      //   roles: true,
-      // },
     } as any);
-    const total = await this.prisma.user.count();
+    const total = await this.prisma.user.count({
+      where,
+    });
     return {
       list,
       total,
