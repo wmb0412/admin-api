@@ -3,21 +3,25 @@ generator client {
   previewFeatures = ["omitApi"]
 }
 
-// datasource db {
-//   provider = "mysql"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
+
+// datasource db {
+//   provider = "postgresql"
+//   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+//   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+// }
 
 model User {
   id        Int      @id @default(autoincrement())
   password  String
   username  String   @unique
+  balance   Decimal  @default(0.0)
+  email     String?
+  /// 0 = unlocked, 1 = locked 2 = padding
+  locked    Int  @default(0) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   roles     Role[]
@@ -40,4 +44,17 @@ model Permission{
 model Sheet {
   id      Int  @id @default(autoincrement())
   context Json
+}
+enum SubscribeType {
+  EMAIL
+  DINGDING
+}
+model Subscribe {
+  id      Int  @id @default(autoincrement())
+  title   String
+  text    String
+  type    SubscribeType @default(EMAIL)
+  users   Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }

@@ -7,10 +7,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Unauthorized } from 'src/common/constant/error.constant';
+import { ErrorResult } from 'src/common/constant/error.constant';
 import { jwtConstants } from 'src/common/constant/jwt.constant';
 import { PUBLIC_KEY } from 'src/common/decorator/public.decorator';
-import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
+import { BizHttpException } from 'src/common/filter/BizHttpException';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -25,14 +25,20 @@ export class AuthGuard implements CanActivate {
     if (isPublics.includes(true)) return true;
     const token = this.getTokenByRequest(request);
     if (!token)
-      throw new ErrorExceptionFilter(Unauthorized, HttpStatus.FORBIDDEN);
+      throw new BizHttpException(
+        ErrorResult.USER_NOT_LOGIN,
+        HttpStatus.FORBIDDEN,
+      );
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
       request['user'] = payload;
     } catch (error) {
-      throw new ErrorExceptionFilter(Unauthorized, HttpStatus.FORBIDDEN);
+      throw new BizHttpException(
+        ErrorResult.USER_NOT_LOGIN,
+        HttpStatus.FORBIDDEN,
+      );
     }
     return true;
   }

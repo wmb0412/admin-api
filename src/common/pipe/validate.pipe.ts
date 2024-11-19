@@ -1,8 +1,8 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { getInvalidParams } from 'src/common/constant/error.constant';
-import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
+import { ErrorResult } from 'src/common/constant/error.constant';
+import { BizHttpException } from 'src/common/filter/BizHttpException';
 
 @Injectable()
 export class validatePipe implements PipeTransform {
@@ -11,7 +11,9 @@ export class validatePipe implements PipeTransform {
     const errors = await validate(object);
     if (errors.length) {
       const firstErrorMessage = Object.values(errors[0].constraints)[0];
-      throw new ErrorExceptionFilter(getInvalidParams(firstErrorMessage));
+      throw new BizHttpException(
+        ErrorResult.getData(firstErrorMessage || ErrorResult.INVALID_PARAMS),
+      );
     }
     return value;
   }

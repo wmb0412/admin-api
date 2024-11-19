@@ -9,17 +9,20 @@ import {
 import axios from 'axios';
 import { JwtService } from '@nestjs/jwt';
 import { getWeixinUserInfo } from 'src/common/utils/weixin';
-import { WEIXIN_CONFIG } from 'src/config/weixin.config';
+import { EnvConfigService } from 'src/common/services/envConfig.service';
+
 @Injectable()
 export class WeixinService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly envConfig: EnvConfigService,
+  ) {}
   create(createWeixinDto: CreateWeixinDto) {
     return 'This action adds a new weixin';
   }
   async login(loginWeixinDto: LoginWeixinDto) {
-    console.log('loginWeixinDto', loginWeixinDto);
     const { code } = loginWeixinDto;
-    const { AppId, AppSecret } = WEIXIN_CONFIG;
+    const { AppId, AppSecret } = this.envConfig.getWxConfig();
     const res: { data: TokenWeixinDto } = await axios.get(
       `https://api.weixin.qq.com/sns/jscode2session?appid=${AppId}&secret=${AppSecret}&js_code=${code}&grant_type=authorization_code`,
     );
@@ -35,16 +38,16 @@ export class WeixinService {
       sessionKey: session_key,
       iv,
       encryptedData,
-      appId: WEIXIN_CONFIG.AppId,
+      appId: this.envConfig.getWxConfig().AppId,
     });
-    console.log('userdata', userData);
     return userData;
   }
   async getPhone(code) {
     const res = await axios.get(
-      `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${WEIXIN_CONFIG.AppId}&secret=${WEIXIN_CONFIG.AppSecret}`,
+      `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${
+        this.envConfig.getWxConfig().AppId
+      }&secret=${this.envConfig.getWxConfig().AppSecret}`,
     );
-    console.log('resresres', res.data);
     const phoneRes = await axios.post(
       `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${res.data.access_token}`,
       {

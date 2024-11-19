@@ -1,8 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { TransformInterceptor } from './common/interceptor/transform.interceptor';
-import { HttpExceptionFilter } from './common/filter/HttpExceptionFilter.filter';
 import { AuthGuard } from './common/guard/auth.guard';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
@@ -18,8 +16,6 @@ async function bootstrap() {
   });
   app.use(cookieParser());
   app.setGlobalPrefix('api');
-  app.useGlobalInterceptors(new TransformInterceptor());
-  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalGuards(new AuthGuard());
   app.useGlobalPipes(
     new ValidationPipe({

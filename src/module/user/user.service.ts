@@ -1,15 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { genSaltSync, hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/read-user.dto';
-import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
-import { userAlreadyExited } from 'src/common/constant/error.constant';
+import { BizHttpException } from 'src/common/filter/BizHttpException';
+import { ErrorResult } from 'src/common/constant/error.constant';
+// import { PrismaService } from 'src/module/prisma/prisma.service';
+import Decimal from 'decimal.js';
+import { sleep } from 'src/common/utils';
+import { CaptchaService } from 'src/common/services/captcha.service';
 import { PrismaService } from 'src/common/services/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly captchaService: CaptchaService,
+  ) {}
   encryptPassword(password?: string) {
     if (!password) {
       return password;
@@ -20,7 +28,7 @@ export class UserService {
     const { password, username, roleIds } = createUserDto;
     const user = await this.findOne(username);
     if (user) {
-      throw new ErrorExceptionFilter(userAlreadyExited);
+      throw new BizHttpException(ErrorResult.USER_ALREADY_EXISTS);
     }
     return this.prisma.user.create({
       data: {
@@ -139,9 +147,91 @@ export class UserService {
         },
       },
     });
+
     return {
       ...userBaseInfo,
       permissions,
     };
+  }
+  async transferAccount(body, res) {
+    // 1. 转账两个用户要一起改，所以需要transaction
+    // 2. 在find和update过程中balance可能被改了 -> 数据不准确 要加锁
+    // 2.1 乐观锁 数据库中添加version或时间戳 修改的时候where version=oldVersion     可能导致更新不了
+    // 2.2 悲观锁  用sql锁定数据库
+    // 2.3 转账的场景适合用悲观锁
+    return await this.prisma.$transaction(async (prisma) => {
+      const userId = res.user.id;
+      if (userId == body.userId) {
+        throw new BizHttpException(ErrorResult.INVALID_PARAMS);
+      }
+      const fromUser = await prisma.user.findFirst({
+        where: { id: userId },
+      });
+      const toUser = await prisma.user.findFirst({
+        where: { id: body.userId },
+      });
+      // 换成悲观锁 FOR UPDATE
+      // const [fromUser] = await prisma.$queryRaw<
+      //   User[]
+      // >`SELECT * FROM \`User\` WHERE \`id\` = ${userId} FOR UPDATE`;
+      // const [toUser] = await prisma.$queryRaw<
+      //   User[]
+      // >`SELECT * FROM \`User\` WHERE \`id\` = ${body.userId} FOR UPDATE`;
+      // if (!fromUser || !toUser) {
+      //   throw new BizHttpException(commonError('用户没找到'));
+      // }
+
+      if (new Decimal(fromUser.balance).minus(body.amount).lt(0)) {
+        throw new BizHttpException(ErrorResult.INSUFFICIENT_BALANCE);
+      }
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          balance: new Decimal(fromUser.balance).minus(body.amount),
+        },
+      });
+      await prisma.user.update({
+        where: { id: toUser.id },
+        data: {
+          balance: new Decimal(toUser.balance).plus(body.amount),
+        },
+      });
+    });
+  }
+  async locked(body) {
+    const { userId, locked } = body;
+    // const prisma = this.prisma;
+    // setTimeout(() => {
+    //   async function changeLocked() {
+    //     const user = await prisma.user.findFirst({ where: { id: userId } });
+    //     const updateRes = await prisma.user.update({
+    //       where: { id: userId },
+    //       data: {
+    //         locked,
+    //       },
+    //     });
+    //   }
+    //   changeLocked();
+    // }, 1000);
+    // 两个请求先后隔一秒发出， 第一个请求也要等8秒
+    // sleep(4000);
+    // 加了微任务， 两个请求先后隔一秒发出， 第一个请求只要等4秒
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        sleep(4000);
+        resolve(1);
+      }, 0),
+    );
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        locked,
+        // locked: 2,
+      },
+    });
+  }
+
+  async getCaptcha() {
+    return this.captchaService.createCaptcha();
   }
 }

@@ -9,6 +9,7 @@ import {
   Param,
   Put,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -65,5 +66,19 @@ export class UserController {
   @Get('info')
   info(@Req() res: Request) {
     return this.userService.info(res);
+  }
+
+  @Post('transferAccount')
+  transferAccount(@Body() body: any, @Req() res: Request) {
+    return this.userService.transferAccount(body, res);
+  }
+  @Patch('locked')
+  locked(@Body() body: any) {
+    return this.userService.locked(body);
+  }
+  @Public()
+  @Get('captcha')
+  async getCaptcha() {
+    return this.userService.getCaptcha();
   }
 }

@@ -31,6 +31,9 @@ export class SignInAuthDto {
     message: '密码不能为空',
   })
   password: string;
+
+  captchaText?: string;
+  captchaId?: string;
 }
 
 export class userLoginResponse {

@@ -4,18 +4,18 @@ import { Response } from 'express';
 import { CreateAuthDto, SignInAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from '../user/user.service';
-import { userPasswordError } from 'src/common/constant/error.constant';
-import { ErrorExceptionFilter } from 'src/common/filter/ErrorExceptionFilter';
+import { ErrorResult } from 'src/common/constant/error.constant';
+import { BizHttpException } from 'src/common/filter/BizHttpException';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constant/jwt.constant';
-import { ConfigService } from '@nestjs/config';
+import { CaptchaService } from 'src/common/services/captcha.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private readonly jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly captchaService: CaptchaService,
   ) {}
   async create(createAuthDto: CreateAuthDto) {
     const { username, password } = createAuthDto;
@@ -27,14 +27,21 @@ export class AuthService {
     return createUser;
   }
   async signIn(signInAuthDto: SignInAuthDto, res?: Response) {
-    const { username, password } = signInAuthDto;
+    const { username, password, captchaId, captchaText } = signInAuthDto;
+    const captchaValidate = await this.captchaService.validateCaptcha(
+      captchaId,
+      captchaText,
+    );
+    if (!captchaValidate) {
+      throw new BizHttpException(ErrorResult.INVALID_CAPTCHA);
+    }
     const user = await this.userService.findOne(username);
     if (!user) {
-      throw new ErrorExceptionFilter(userPasswordError);
+      throw new BizHttpException(ErrorResult.USER_PASSWORD_ERROR);
     }
     const { password: ps, ...rest } = user || {};
     if (!compareSync(password, ps)) {
-      throw new ErrorExceptionFilter(userPasswordError);
+      throw new BizHttpException(ErrorResult.USER_PASSWORD_ERROR);
     }
     const payload = { id: user.id, username: user.username };
     const access_token = await this.jwtService.signAsync(payload);
