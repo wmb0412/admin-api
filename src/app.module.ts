@@ -1,15 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './module/user/user.module';
-import { AuthModule } from './module/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './common/constant/jwt.constant';
 import { validatePipe } from './common/pipe/validate.pipe';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { SheetModule } from './module/sheet/sheet.module';
-import { RoleModule } from './module/role/role.module';
-import { PermissionModule } from './module/permission/permission.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { HttpExceptionFilter } from './common/filter/HttpExceptionFilter.filter';
 import { AuthGuard } from './common/guard/auth.guard';
@@ -37,13 +32,6 @@ export const UPLOADS_DIR = join(__dirname, '../uploads');
         expiresIn: `${30 * 24 * 60 * 60}s`,
       },
     }),
-    UserModule,
-    AuthModule,
-    // WeixinModule,
-    SheetModule,
-    RoleModule,
-    PermissionModule,
-    // ConfigModule,
   ],
   controllers: [],
   providers: [

@@ -7,7 +7,6 @@ export class ErrorResult {
   static USER_NOT_LOGIN = '用户未登录';
   static SUBSCRIBE_NOT_FOUND = '订阅不存在';
   static INVALID_CAPTCHA = '10003:验证码错误';
-  static INSUFFICIENT_BALANCE = '10004:余额不足';
   static getData(message: string, code = -1) {
     return {
       code,
