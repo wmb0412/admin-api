@@ -17,6 +17,8 @@ import { TransformInterceptor } from './common/interceptor/transform.interceptor
 import { AllExceptionsFilter } from './common/filter/AllExceptions.filter';
 import { GlobalModule } from './module/global.module';
 import { EnvConfigService } from './common/services/envConfig.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleService } from './common/services/schedule.service';
 export const UPLOADS_DIR = join(__dirname, '../uploads');
 
 @Module({
@@ -43,10 +45,12 @@ export const UPLOADS_DIR = join(__dirname, '../uploads');
     SheetModule,
     RoleModule,
     PermissionModule,
+    ScheduleModule.forRoot(),
     // ConfigModule,
   ],
   controllers: [],
   providers: [
+    ScheduleService,
     HttpExceptionFilter,
     {
       provide: APP_PIPE,

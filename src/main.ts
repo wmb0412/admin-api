@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
+  console.log('启动');
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: function (origin, cb) {

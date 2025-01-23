@@ -3,6 +3,7 @@ import { ErrorResult } from 'src/common/constant/error.constant';
 import { BizHttpException } from 'src/common/filter/BizHttpException';
 import { EmailService } from 'src/common/services/email.service';
 import { PrismaService } from 'src/common/services/prisma.service';
+import { SubscribeCreateDto } from './dto/subscribe.dto';
 
 @Injectable()
 export class SubscribeService {
@@ -10,7 +11,7 @@ export class SubscribeService {
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
   ) {}
-  create(data) {
+  create(data: SubscribeCreateDto) {
     return this.prisma.subscribe.create({ data });
   }
   getAllSubscribe() {
